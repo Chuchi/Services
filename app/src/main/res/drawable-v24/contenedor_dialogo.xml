@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- color de fondo -->
+    <solid android:color="@color/Fucsia25" />
+
+    <!-- curvatura de las esquinas -->
+    <corners android:radius="10dp" />
+
+    <!-- padding para dejar una separacin prudencial entre los elementos conetenidos y el borde -->
+    <padding />
+
+    <!-- borde -->
+    <stroke
+        android:width="5dp"
+        android:color="@color/Fucsia75" />
+
+</shape>
