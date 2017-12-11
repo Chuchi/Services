@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/Fucsia50">
@@ -22,14 +23,59 @@
 
     <TextView
         android:id="@+id/TXV10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/IMBTN10"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/IMBTN10"
+        android:clickable="true"
+        android:text="TextView"
+        android:textColor="@color/Lila125"
+        android:textSize="25sp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/TXV11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/IMBTN10"
+        android:layout_alignStart="@+id/TXV10"
+        android:text="Poblacion"
+        android:textColor="@color/Lila125"
+        android:textSize="22sp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/TXV21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/TXV10"
+        android:layout_marginTop="6dp"
+        android:text="Poblacion"
+        android:textColor="@color/Lila125"
+        android:textSize="10sp"
+        android:visibility="visible" />
+
+    <EditText
+        android:id="@+id/EDT10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/IMBTN10"
-        android:layout_alignTop="@+id/IMBTN10"
-        android:clickable="true"
-        android:text="TextView"
-        android:textColor="@color/Fucsia100"
-        android:textSize="25sp"
-        android:visibility="invisible"/>
+        android:layout_below="@+id/TXV11"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:visibility="invisible"
+        android:text="Informacion Adicional" />
+
+    <Button
+        android:id="@+id/BTN10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        android:text="OK"
+        android:textSize="25sp" />
 
 </RelativeLayout>
