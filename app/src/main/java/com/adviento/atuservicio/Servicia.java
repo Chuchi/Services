@@ -10,12 +10,14 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -23,11 +25,18 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class Servicia extends AppCompatActivity implements View.OnClickListener{
 
     TextView TXV10, TXV11, TXV21;
+    Button BTN10;
     EditText EDT10;
     ImageButton IMBTN10;
     ArrayList<String[]> Orden;
@@ -83,8 +92,20 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener{
         TXV11 = (TextView) findViewById(R.id.TXV11);
         TXV21 = (TextView) findViewById(R.id.TXV21);
         EDT10 = (EditText) findViewById(R.id.EDT10);
+        BTN10=(Button)findViewById(R.id.BTN10);
 
         IMBTN10.setOnClickListener(this);
+
+        BTN10.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String jason = "body = {\"Latitud \":43.5244152,\" Servicio \": 552 ,\" Cliente \":125,\" Longuitud \":35.3652,\"Localidad \":99.5,\" IdPeticion \":54,\"Observaciones \":\" Buenas tardes PERR \"}";
+                TareaWSInsertar tarea = new TareaWSInsertar();
+                tarea.execute(jason);
+            }
+        });
+
 
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -300,5 +321,56 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener{
         pedido = builder.create();
         pedido.show();
     }
-}
+    private class TareaWSInsertar extends AsyncTask<String,Integer,Boolean> {
 
+        protected Boolean doInBackground(String... params) {
+
+            boolean resul = true;
+
+// Obtener la conexión
+            HttpURLConnection con = null;
+
+            try {
+                // Construir los datos a enviar
+                URL url = new URL("http://sareta.somee.com/caminata");
+
+              //  String data = "body=" + URLEncoder.encode(params[0],"UTF-8");
+            String data = params[0];
+                con = (HttpURLConnection)url.openConnection();
+
+                // Activar método POST
+                con.setDoOutput(true);
+
+                // Tamaño previamente conocido
+                con.setFixedLengthStreamingMode(data.getBytes().length);
+
+                // Establecer application/x-www-form-urlencoded debido a la simplicidad de los datos
+                con.setRequestProperty("Content-Type","application/json");
+
+                OutputStream out = new BufferedOutputStream(con.getOutputStream());
+
+                out.write(data.getBytes());
+                out.flush();
+                out.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(con!=null)
+                    con.disconnect();
+            }
+
+            return resul;
+        }
+
+        protected void onPostExecute(Boolean result) {
+
+            if (result)
+            {
+
+            }
+        }
+    }
+
+
+}
