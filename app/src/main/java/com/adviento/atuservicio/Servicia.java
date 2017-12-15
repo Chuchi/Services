@@ -24,13 +24,15 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class Servicia extends AppCompatActivity implements View.OnClickListener{
@@ -100,7 +102,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener{
 
             @Override
             public void onClick(View v) {
-                String jason = "body = {\"Latitud \":43.5244152,\" Servicio \": 552 ,\" Cliente \":125,\" Longuitud \":35.3652,\"Localidad \":99.5,\" IdPeticion \":54,\"Observaciones \":\" Buenas tardes PERR \"}";
+                String jason = "{\"Latitud \":43.5244152,\" Servicio \": 552 ,\" Cliente \":125,\" Longuitud \":35.3652,\"Localidad \":99.5,\" IdPeticion \":54,\"Observaciones \":\" Buenas tardes PERR \"}";
                 TareaWSInsertar tarea = new TareaWSInsertar();
                 tarea.execute(jason);
             }
@@ -328,36 +330,50 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener{
             boolean resul = true;
 
 // Obtener la conexión
-            HttpURLConnection con = null;
+            HttpURLConnection MiConexion = null;
 
             try {
                 // Construir los datos a enviar
                 URL url = new URL("http://sareta.somee.com/caminata");
+                String Datos_cuerpo=params[0];
+                MiConexion = (HttpURLConnection)url.openConnection();
+                MiConexion.setRequestMethod("POST");
+                MiConexion.setRequestProperty("Content-Type","application/json");
 
-              //  String data = "body=" + URLEncoder.encode(params[0],"UTF-8");
-            String data = params[0];
-                con = (HttpURLConnection)url.openConnection();
+               // MiConexion.setRequestProperty("Content-Length",  Integer.toString(Datos_cuerpo.getBytes().length));
+              //  connection.setRequestProperty("Content-Language", "en-US");
 
-                // Activar método POST
-                con.setDoOutput(true);
+              //  connection.setUseCaches (false);
+                MiConexion.setDoInput(true);
+                MiConexion.setDoOutput(true);
 
-                // Tamaño previamente conocido
-                con.setFixedLengthStreamingMode(data.getBytes().length);
+                InputStream Entrada = new BufferedInputStream(MiConexion.getInputStream());
 
-                // Establecer application/x-www-form-urlencoded debido a la simplicidad de los datos
-                con.setRequestProperty("Content-Type","application/json");
+                BufferedReader LectorBuffer = new BufferedReader(new InputStreamReader(Entrada));
+                String linea;
+                StringBuffer respuesta = new StringBuffer();
+                while((linea = LectorBuffer.readLine()) != null) {
+                    respuesta.append(linea);
+                    respuesta.append('\r');
+                }
+                LectorBuffer.close();
+                System.out.println("Respuesta del servidor:" + respuesta.toString());
 
-                OutputStream out = new BufferedOutputStream(con.getOutputStream());
 
-                out.write(data.getBytes());
-                out.flush();
-                out.close();
+
+                // Obtener el estado del recurso
+
+            if (MiConexion.getResponseCode() == 200) {
+                Toast.makeText(Servicia.this, "Buenos   " +respuesta, Toast.LENGTH_SHORT).show();
+            } else {
+               Toast.makeText(Servicia.this, "Malo", Toast.LENGTH_SHORT).show();
+          }
 
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if(con!=null)
-                    con.disconnect();
+                if(MiConexion!=null)
+                    MiConexion.disconnect();
             }
 
             return resul;
