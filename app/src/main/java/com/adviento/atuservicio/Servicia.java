@@ -160,19 +160,13 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
             public void onStatusChanged(String provider, int status, Bundle extras) {
             }
         };
-
         locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, locListener);
-
-
         String Amaranth_Regular = "Vermut/Amaranth-Regular.ttf";
         String Amaranth_Bold = "Vermut/Amaranth-Bold.ttf";
-
         TFAmaranthRegular = Typeface.createFromAsset(getAssets(), Amaranth_Regular);
         TFAmaranthBold = Typeface.createFromAsset(getAssets(), Amaranth_Bold);
         TXV10.setTypeface(TFAmaranthBold);
-
         Chispea.postDelayed(caifas, 500);
-
     }
 
     @Override
@@ -280,33 +274,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
 
     }
 
-    /*  public void mostrar(View view)
-      {
-          // con este tema personalizado evitamos los bordes por defecto
-          customDialog = new Dialog(this,R.style.Theme_Dialog_Translucent);
-          //deshabilitamos el título por defecto
-          customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-          //obligamos al usuario a pulsar los botones para cerrarlo
-          customDialog.setCancelable(false);
-          //establecemos el contenido de nuestro dialog
-          customDialog.setContentView(R.layout.dialog);
 
-          GridView GRD10 = (GridView) customDialog.findViewById(R.id.DIAGRD10);
-          PoblarGrid();
-             ((Button) customDialog.findViewById(R.id.aceptar)).setOnClickListener(new View.OnClickListener() {
-
-              @Override
-              public void onClick(View view)
-              {
-                  customDialog.dismiss();
-                  Toast.makeText(Servicia.this, "ACCEPT", Toast.LENGTH_SHORT).show();
-
-              }
-          });
-
-          customDialog.show();
-      }
-  */
     public void PoblarGrid(GridView grid) {
         Orden = new ArrayList<String[]>();
         ayuquito.AbrirBase();
@@ -405,7 +373,6 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
             }
     }
     }
-
     private String LectorRespuestas(HttpURLConnection connection) {
         String result = null;
         StringBuffer sb = new StringBuffer();
