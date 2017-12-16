@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -26,6 +25,9 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -55,7 +57,11 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
     Double Lat = 0d;
     Double Long = 0d;
     AlertDialog pedido;
-    int IdClient = 2;
+    int IdClient = 39;
+    int Ciudadela =0;
+    int Serviciax=0;
+    static JSONObject json;
+
 
 
     //  int Localidad=0;
@@ -104,13 +110,26 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
 
         IMBTN10.setOnClickListener(this);
 
+
         BTN10.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                String jason = "body= {Latitud :43.5244152, Servicio: 552 , Cliente :125}";
+                json = new JSONObject();
+
+                try {
+                    json.put("Cliente", IdClient);
+                    json.put("Servicio", Serviciax);
+                    json.put("Latitud", Lat);
+                    json.put("Longuitud", Long);
+                    json.put("Localidad", Ciudadela);
+                    json.put("Observaciones", EDT10.getText());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 TareaWSInsertar tarea = new TareaWSInsertar();
-                tarea.execute(jason);
+                tarea.execute(json.toString());
             }
         });
 
@@ -173,7 +192,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-
+                        Serviciax= Integer.parseInt(Orden.get(position)[0]);
                         ayuquito.AbrirBase();
 
                         TXV10.setVisibility(View.VISIBLE);
@@ -193,6 +212,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
                             TXV11.setOnClickListener(Servicia.this);
                         } else {
                             EDT10.setVisibility(View.VISIBLE);
+
                         }
 
                         MiDialogo.dismiss();
@@ -224,7 +244,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
                         // Direcciona en el primer punteo
 
                         if (punteos > 0) {
-
+                            Ciudadela=(int)id;
                             String casino = String.valueOf(id);
                             //    Localidad = id;
                             ayuquito.AbrirBase();
@@ -334,36 +354,38 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
         pedido.show();
     }
 
-    private class TareaWSInsertar extends AsyncTask<String, Integer, String> {
+    private class TareaWSInsertar extends AsyncTask<String, String, String> {
 
         protected String doInBackground(String... params) {
 
             String resul="";
 
 // Obtener la conexión
+
+
             HttpURLConnection MiConexion = null;
 
             try {
                 // Construir los datos a enviar
                 URL url = new URL("http://sareta.somee.com/caminatodo");
-                String Datos_cuerpo = params[0];
+                String Datos_cuerpo =params[0];
                 MiConexion = (HttpURLConnection) url.openConnection();
                 MiConexion.setRequestMethod("POST");
                 MiConexion.setRequestProperty("Content-Type", "application/json");
-
-                // MiConexion.setRequestProperty("Content-Length",  Integer.toString(Datos_cuerpo.getBytes().length));
+                MiConexion.setRequestProperty("Content-Length",  Integer.toString(Datos_cuerpo.getBytes().length));
                 //  connection.setRequestProperty("Content-Language", "en-US");
 
                 //  connection.setUseCaches (false);
                 MiConexion.setDoInput(true);
                 MiConexion.setDoOutput(true);
-                resul=LectorRespuestas(MiConexion);
 
                 OutputStream out = new BufferedOutputStream(MiConexion.getOutputStream());
 
                 out.write(Datos_cuerpo.getBytes());
                 out.flush();
                 out.close();
+
+                resul=LectorRespuestas(MiConexion);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -376,9 +398,12 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
         }
 
         protected void onPostExecute(String  result) {
-            setTitle(result);
+            if (result.equals("1")){
+                Toast.makeText(Servicia.this, "Peticion de Servicio ha sido activada", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(Servicia.this, "Se ha reportado un problema. Verifique su conexion a internet e intentelo de nuevo mas tarde", Toast.LENGTH_LONG).show();
             }
-
+    }
     }
 
     private String LectorRespuestas(HttpURLConnection connection) {
@@ -409,4 +434,5 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
 
         return result;
     }
+
 }
