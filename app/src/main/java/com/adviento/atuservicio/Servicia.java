@@ -1,19 +1,30 @@
 package com.adviento.atuservicio;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -21,12 +32,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -43,28 +52,41 @@ import java.util.ArrayList;
 public class Servicia extends AppCompatActivity implements View.OnClickListener {
 
 
-    TextView TXV10, TXV11, TXV21;
+    TextView TXV10, TXV101, TXV21, TXV40;
     Button BTN10;
     EditText EDT10;
-    ImageButton IMBTN10;
+    TextInputLayout Cortina11;
+    ImageButton BTNCAMERA1 , BTNCAMERA2, BTNCAMERA3 , BTNCAMERA4,IMBTN10;
+    LinearLayout LLVV40 ;
     ArrayList<String[]> Orden;
     MiAyudanteSQLite ayuquito;
     Typeface TFAmaranthRegular;
     Typeface TFAmaranthBold;
     Dialog MiDialogo = null;
+
+    Intent PideCamara1, DameArchivo1,PideCamara2, DameArchivo2;
+    int Toma1 =258;
+    int Toma2=365;
+    int Arch1 =33;
+    int Arch2=35;
+
+    private Uri imaginax;
+    private Bitmap bmppp;
+
     LocationManager locManager;
     LocationListener locListener;
     Double Lat = 0d;
     Double Long = 0d;
+
     AlertDialog pedido;
     int IdClient = 39;
-    int Ciudadela =0;
-    int Serviciax=0;
+    int Ciudadela = 0;
+    int Serviciax = 0;
     static JSONObject json;
+    SharedPreferences sonadas;
 
 
-
-    //  int Localidad=0;
+    final static int Codigo_Peticion_Permiso_Ubicacion=14;
     int ServicioElegido = 0;
 
     Boolean inter = false;
@@ -74,22 +96,22 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
         public void run() {
             Flasheo();
             if (inter) {
-                IMBTN10.setAlpha(1f);
+                IMBTN10.setImageResource(R.drawable.necesito);
             } else {
-                IMBTN10.setAlpha(0.3f);
+                IMBTN10.setImageResource(R.drawable.escoger);
             }
-            Chispea.postDelayed(caifas, 1200);
+            Chispea.postDelayed(caifas, 700);
         }
     };
     Runnable anas = new Runnable() {
         public void run() {
             Flasheo();
             if (inter) {
-                TXV11.setAlpha(1f);
+                TXV101.setAlpha(1f);
             } else {
-                TXV11.setAlpha(0.3f);
+                TXV101.setAlpha(0.3f);
             }
-            Chispea.postDelayed(anas, 600);
+            Chispea.postDelayed(anas, 400);
         }
     };
 
@@ -97,127 +119,122 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_servicia);
+        sonadas = PreferenceManager.getDefaultSharedPreferences(this);
+            setContentView(R.layout.activity_servicia);
 
-        ayuquito = new MiAyudanteSQLite(this);
+            ayuquito = new MiAyudanteSQLite(this);
 
-        IMBTN10 = (ImageButton) findViewById(R.id.IMBTN10);
-        TXV10 = (TextView) findViewById(R.id.TXV10);
-        TXV11 = (TextView) findViewById(R.id.TXV11);
-        TXV21 = (TextView) findViewById(R.id.TXV21);
-        EDT10 = (EditText) findViewById(R.id.EDT10);
-        BTN10 = (Button) findViewById(R.id.BTN10);
+            IMBTN10 = (ImageButton) findViewById(R.id.IMBTN10);
+            BTNCAMERA1=(ImageButton) findViewById(R.id.BTNCAMERA1) ;
+            BTNCAMERA2=(ImageButton) findViewById(R.id.BTNCAMERA2) ;
+            BTNCAMERA3=(ImageButton) findViewById(R.id.BTNCAMERA3) ;
+            BTNCAMERA4=(ImageButton) findViewById(R.id.BTNCAMERA4) ;
+            LLVV40=(LinearLayout) findViewById(R.id.LLVV40);
+            TXV10 = (TextView) findViewById(R.id.TXV10);
+            TXV40 = (TextView) findViewById(R.id.TXV40);
+            TXV101 = (TextView) findViewById(R.id.TXV101);
+            TXV21 = (TextView) findViewById(R.id.TXV21);
+            EDT10 = (EditText) findViewById(R.id.EDT10);
+            BTN10 = (Button) findViewById(R.id.BTN10);
+            Cortina11 = (TextInputLayout) findViewById(R.id.Cortina11);
 
-        IMBTN10.setOnClickListener(this);
+
+            IMBTN10.setOnClickListener(this);
+            BTNCAMERA1.setOnClickListener(this);
+            BTNCAMERA2.setOnClickListener(this);
+
+            //Configura aspecto inicial
+            BTNCAMERA3.setAlpha(0.2f);
+            BTNCAMERA3.setPadding(30,30,30,30);
+            BTNCAMERA4.setAlpha(0.2f);
+            BTNCAMERA4.setPadding(30,30,30,30);
+
+            TXV40.setOnClickListener(this);
+            Cortina11.setVisibility(View.INVISIBLE);
+            LLVV40.setVisibility(View.INVISIBLE);
+            TXV40.setVisibility(View.INVISIBLE);
+            AbreDialogoServicios();
+
+            TXV101.setText(sonadas.getString(getResources().getString(R.string.PropiedadNombre), "") + " " + sonadas.getString(getResources().getString(R.string.PropiedadApellido), ""));
 
 
-        BTN10.setOnClickListener(new View.OnClickListener() {
+            BTN10.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                json = new JSONObject();
+                @Override
+                public void onClick(View v) {
 
-                try {
-                    json.put("Cliente", IdClient);
-                    json.put("Servicio", Serviciax);
-                    json.put("Latitud", Lat);
-                    json.put("Longuitud", Long);
-                    json.put("Localidad", Ciudadela);
-                    json.put("Observaciones", EDT10.getText());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    /*
+                    json = new JSONObject();
+
+                    try {
+                        json.put("Cliente", IdClient);
+                        json.put("Servicio", Serviciax);
+                        json.put("Latitud", Lat);
+                        json.put("Longuitud", Long);
+                        json.put("Localidad", Ciudadela);
+                        json.put("Observaciones", EDT10.getText());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    TareaWSInsertar tarea = new TareaWSInsertar();
+                    tarea.execute(json.toString());*/
                 }
-
-                TareaWSInsertar tarea = new TareaWSInsertar();
-                tarea.execute(json.toString());
+            });
+            //Verifica si los permisos de Ubicacion esta concedidos. En caso negativo pide al usuario
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Codigo_Peticion_Permiso_Ubicacion);
+            }else {
+            //En caso positivo, continua instanciando el servico de Ubicacion
+                InstanciaUbicacion();
             }
-        });
 
-
-        locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            AlertNoGps();
+            String Amaranth_Regular = "Vermut/Amaranth-Regular.ttf";
+            String Amaranth_Bold = "Vermut/Amaranth-Bold.ttf";
+            TFAmaranthRegular = Typeface.createFromAsset(getAssets(), Amaranth_Regular);
+            TFAmaranthBold = Typeface.createFromAsset(getAssets(), Amaranth_Bold);
+            TXV10.setTypeface(TFAmaranthBold);
+            TXV40.setTypeface(TFAmaranthBold);
+            Chispea.postDelayed(caifas, 500);
         }
-
-        locListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-
-                Lat = location.getLatitude();
-                Long = location.getLongitude();
-                TXV21.setText(String.valueOf(Lat) + " , " + String.valueOf(Long));
-
-
-            }
-
-
-            public void onProviderDisabled(String provider) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-        };
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, locListener);
-        String Amaranth_Regular = "Vermut/Amaranth-Regular.ttf";
-        String Amaranth_Bold = "Vermut/Amaranth-Bold.ttf";
-        TFAmaranthRegular = Typeface.createFromAsset(getAssets(), Amaranth_Regular);
-        TFAmaranthBold = Typeface.createFromAsset(getAssets(), Amaranth_Bold);
-        TXV10.setTypeface(TFAmaranthBold);
-        Chispea.postDelayed(caifas, 500);
-    }
 
     @Override
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.IMBTN10:
-                // con este tema personalizado evitamos los bordes por defecto
-                MiDialogo = new Dialog(this, R.style.Theme_Dialog_Translucent);
-                //deshabilitamos el título por defecto
-                MiDialogo.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                //establecemos el contenido de nuestro dialog
-                MiDialogo.setContentView(R.layout.dialog);
 
-                final GridView GRD10 = (GridView) MiDialogo.findViewById(R.id.DIAGRD10);
-                GRD10.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
-                        Serviciax= Integer.parseInt(Orden.get(position)[0]);
-                        ayuquito.AbrirBase();
-
-                        TXV10.setVisibility(View.VISIBLE);
-                        TXV10.setText(Orden.get(position)[1]);
-
-
-                        TXV10.setOnClickListener(Servicia.this);
-                        String icono = Orden.get(position)[2];
-
-                        ServicioElegido = Integer.valueOf(Orden.get(position)[0]);
-
-                        IMBTN10.setImageResource(Servicia.this.getResources().getIdentifier(icono, "drawable", Servicia.this.getPackageName()));
-                        Chispea.removeCallbacks(caifas);
-                        if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                            TXV11.setVisibility(View.VISIBLE);
-                            Chispea.postDelayed(anas, 500);
-                            TXV11.setOnClickListener(Servicia.this);
-                        } else {
-                            EDT10.setVisibility(View.VISIBLE);
-
-                        }
-
-                        MiDialogo.dismiss();
-                    }
-                });
-
-                PoblarGrid(GRD10);
-                MiDialogo.show();
+            case R.id.TXV40:
+                LLVV40.setAlpha(1f);
+                TXV40.setVisibility(View.INVISIBLE);
                 break;
 
+            case R.id.IMBTN10:
+                AbreDialogoServicios();
 
+                break;
+
+            case R.id.BTNCAMERA1:
+                PideCamara1 = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(PideCamara1,Toma1);
+                break;
+
+            case R.id.BTNCAMERA3:
+                PideCamara2 = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(PideCamara2,Toma2);
+                break;
+
+            case R.id.BTNCAMERA2:
+                DameArchivo1 = new Intent(Intent.ACTION_GET_CONTENT);
+                DameArchivo1.setType("image/*");
+                startActivityForResult(DameArchivo1, Arch1);
+                break;
+
+            case R.id.BTNCAMERA4:
+                DameArchivo2 = new Intent(Intent.ACTION_GET_CONTENT);
+                DameArchivo2.setType("image/*");
+                startActivityForResult(DameArchivo2, Arch2);
+                break;
+/*
             case R.id.TXV11: // ImageButton ORIGEN
                 Chispea.removeCallbacks(caifas);
                 final Dialog dialog = new Dialog(this, R.style.Theme_Dialog_Translucent);
@@ -270,11 +287,81 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
                 dialog.show();
                 ayuquito.CerrarBase();
                 break;
+                */
         }
 
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case Codigo_Peticion_Permiso_Ubicacion: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    InstanciaUbicacion();
+
+                } else {
+
+                    Toast.makeText(this, "Esta app necesita obligatoriamente permisos de Ubicacion para funcionar correctamente", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+        }
+    }
+    @Override
+    protected  void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+
+        if (requestCode == Toma1 && resultCode == RESULT_OK  ) {
+            Bundle ext = data.getExtras();
+            bmppp= (Bitmap)ext.get("data");
+            BTNCAMERA1.setImageBitmap(bmppp);
+
+            BTNCAMERA3.setImageResource(R.drawable.camarita);
+            BTNCAMERA3.setPadding(0,0,0,0);
+            BTNCAMERA3.setAlpha(1f);
+            BTNCAMERA3.setOnClickListener(this);
 
 
+        }
+
+        if (requestCode == Toma2 && resultCode == RESULT_OK ) {
+            Bundle ext = data.getExtras();
+            bmppp= (Bitmap)ext.get("data");
+            BTNCAMERA3.setImageBitmap(bmppp);
+
+        }
+
+        if (requestCode == Arch1 && resultCode == RESULT_OK   ){
+            imaginax = data.getData();
+            BTNCAMERA2.setImageURI(imaginax);
+            BTNCAMERA4.setImageResource(R.drawable.archivito);
+            BTNCAMERA4.setPadding(0,0,0,0);
+            BTNCAMERA4.setAlpha(1f);
+            BTNCAMERA4.setOnClickListener(this);
+
+
+        }
+
+        if (requestCode == Arch2 && resultCode == RESULT_OK  ) {
+            imaginax = data.getData();
+            BTNCAMERA4.setImageURI(imaginax);
+
+        }
+    }
+    private void checkCameraPermission() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso para la camara!.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+            Toast.makeText(this, "sera", Toast.LENGTH_LONG).show();
+        } else {
+            Log.i("Mensaje", "Tienes permiso para usar la camara.");
+
+        }
+    }
     public void PoblarGrid(GridView grid) {
         Orden = new ArrayList<String[]>();
         ayuquito.AbrirBase();
@@ -401,5 +488,77 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
 
         return result;
     }
+    public void InstanciaUbicacion(){
+
+        locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Pide al usuario activar el GPS en caso de estar desactivado
+        assert locManager != null;
+        if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+           AlertNoGps();
+           // turnGPSOn();
+        }
+
+        locListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+
+                Lat = location.getLatitude();
+                Long = location.getLongitude();
+                TXV21.setText(String.valueOf(Lat) + " , " + String.valueOf(Long));
+
+
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+        };
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, locListener);
+    }
+    private void AbreDialogoServicios(){
+        // con este tema personalizado evitamos los bordes por defecto
+        MiDialogo = new Dialog(this, R.style.Theme_Dialog_Translucent);
+        //deshabilitamos el título por defecto
+        MiDialogo.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //establecemos el contenido de nuestro dialog
+        MiDialogo.setContentView(R.layout.dialog);
+
+        final GridView GRD10 = (GridView) MiDialogo.findViewById(R.id.DIAGRD10);
+        GRD10.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                Serviciax= Integer.parseInt(Orden.get(position)[0]);
+                ayuquito.AbrirBase();
+
+                TXV10.setVisibility(View.VISIBLE);
+                TXV10.setText(Orden.get(position)[1]);
+
+
+                TXV10.setOnClickListener(Servicia.this);
+                String icono = Orden.get(position)[2];
+
+                ServicioElegido = Integer.valueOf(Orden.get(position)[0]);
+
+                IMBTN10.setImageResource(Servicia.this.getResources().getIdentifier(icono, "drawable", Servicia.this.getPackageName()));
+                Chispea.removeCallbacks(caifas);
+                Cortina11.setVisibility(View.VISIBLE);
+                LLVV40.setVisibility(View.VISIBLE);
+                LLVV40.setAlpha(0.1f);
+                TXV40.setVisibility(View.VISIBLE);
+
+
+                MiDialogo.dismiss();
+            }
+        });
+
+        PoblarGrid(GRD10);
+        MiDialogo.show();
+    }
+
 
 }

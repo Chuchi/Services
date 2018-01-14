@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
-        android:textSize="15sp"/>
+        android:textSize="14sp"/>
 
     <ImageView
         android:id="@+id/Imaginita11"

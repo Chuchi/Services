@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/Fucsia50">
+    android:focusableInTouchMode="true"
+    android:background="@color/Lila25">
 
 
     <ImageButton
@@ -27,23 +28,13 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/IMBTN10"
         android:layout_marginStart="12dp"
+        android:layout_marginTop="30dp"
         android:layout_toEndOf="@+id/IMBTN10"
         android:clickable="true"
         android:text="TextView"
         android:textColor="@color/Lila125"
         android:textSize="25sp"
-        android:visibility="invisible" />
-
-    <TextView
-        android:id="@+id/TXV11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/IMBTN10"
-        android:layout_alignStart="@+id/TXV10"
-        android:text="Poblacion"
-        android:textColor="@color/Lila125"
-        android:textSize="22sp"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/TXV21"
@@ -55,19 +46,105 @@
         android:text="Poblacion"
         android:textColor="@color/Lila125"
         android:textSize="10sp"
-        android:visibility="visible" />
+        android:visibility="visible"/>
 
-    <EditText
-        android:id="@+id/EDT10"
-        android:layout_width="match_parent"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/Cortina11"
+        style="1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/IMBTN10"
-        android:layout_below="@+id/TXV11"
-        android:layout_marginTop="28dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:visibility="invisible"
-        android:text="Informacion Adicional" />
+        android:layout_below="@+id/IMBTN10"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_weight="1">
+
+        <EditText
+            android:id="@+id/EDT10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Informaçao Adicional"
+            android:inputType="text|textCapSentences"
+            android:textColor="@android:color/black"
+            android:textColorHint="@color/Lila100"
+            android:textSize="16sp"
+            android:visibility="visible"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:id="@+id/LLVV40"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/BTN10"
+        android:layout_below="@+id/Cortina11"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/LLHH30A"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/BTNCAMERA1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/camarita"/>
+
+
+            <ImageButton
+                android:id="@+id/BTNCAMERA2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/archivito"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/LLHH30B"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/BTNCAMERA3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/camarita_b"/>
+
+            <ImageButton
+                android:id="@+id/BTNCAMERA4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/archivito_b"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/BTN10"
@@ -75,7 +152,33 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"
+        android:background="@color/Lila50"
         android:text="OK"
-        android:textSize="25sp" />
+        android:textColor="@color/Lila100"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:id="@+id/TXV101"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:text="Texto"
+        android:textColor="@color/Lila125"/>
+
+    <TextView
+        android:id="@+id/TXV40"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:autoText="false"
+        android:elevation="8dp"
+        android:lines="2"
+        android:text="Tomar Foto       (Opcional)"
+        android:textAlignment="center"
+        android:textColor="@color/Lila125"
+        android:textSize="35sp"
+        android:textStyle="bold"/>
 
 </RelativeLayout>

@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">ATuServicio</string>
+    <string name="app_name">RAFHÀ</string>
+    <string name="Cliente">Cliente</string>
+    <string name="Profesional">Profissional</string>
+    <string name="Nombre">Nome</string>
+    <string name="Apellido">Sobrenome</string>
+    <string name="Contraseña">Sehna</string>
+    <string name="Celular">Celular</string>
+    <string name="OK">OK</string>
+
+
+
+
+    <string name="PropiedadNombre">PropiedadNombre</string>
+    <string name="PropiedadApellido">PropiedadApellido</string>
+    <string name="PropiedadCelular">PropiedadCelular</string>
+    <string name="title_activity_panel_cl">PanelCL</string>
+
+    <string name="modificar">modificar</string>
+    <string name="añadir">añadir</string>
+    <string name="acerca">Acerca de</string>
 </resources>

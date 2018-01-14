@@ -8,4 +8,13 @@
     <color name="Fucsia50">#f99ebd</color>
     <color name="Fucsia25">#f9d4e0</color>
     <color name="Lila125">#720181</color>
+    <color name="Lila100">#6600fb</color>
+    <color name="Lila75">#802bfc</color>
+    <color name="Lila50">#af7afe</color>
+    <color name="Lila25">#dcc7fc</color>
+    <color name="Naranja100">#f74904</color>
+    <color name="Naranja75">#fa7e4d</color>
+    <color name="Naranja50">#f9b89e</color>
+    <color name="Naranja25">#f6e5de</color>
+
 </resources>
