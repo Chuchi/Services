@@ -19,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,9 +32,11 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -63,6 +64,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
     Typeface TFAmaranthRegular;
     Typeface TFAmaranthBold;
     Dialog MiDialogo = null;
+    ProgressBar Progress11;
 
     Intent PideCamara1, DameArchivo1,PideCamara2, DameArchivo2;
     int Toma1 =258;
@@ -79,10 +81,9 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
     Double Long = 0d;
 
     AlertDialog pedido;
-    int IdClient = 39;
-    int Ciudadela = 0;
+
     int Serviciax = 0;
-    static JSONObject json;
+     JSONObject json;
     SharedPreferences sonadas;
 
 
@@ -137,9 +138,11 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
             EDT10 = (EditText) findViewById(R.id.EDT10);
             BTN10 = (Button) findViewById(R.id.BTN10);
             Cortina11 = (TextInputLayout) findViewById(R.id.Cortina11);
+           Progress11=(ProgressBar)findViewById(R.id.Progress11) ;
 
 
             IMBTN10.setOnClickListener(this);
+            BTN10.setOnClickListener(this);
             BTNCAMERA1.setOnClickListener(this);
             BTNCAMERA2.setOnClickListener(this);
 
@@ -155,32 +158,10 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
             TXV40.setVisibility(View.INVISIBLE);
             AbreDialogoServicios();
 
-            TXV101.setText(sonadas.getString(getResources().getString(R.string.PropiedadNombre), "") + " " + sonadas.getString(getResources().getString(R.string.PropiedadApellido), ""));
+            TXV101.setText(sonadas.getString(getResources().getString(R.string.PropiedadIdCliente), "") );
 
 
-            BTN10.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-
-                    /*
-                    json = new JSONObject();
-
-                    try {
-                        json.put("Cliente", IdClient);
-                        json.put("Servicio", Serviciax);
-                        json.put("Latitud", Lat);
-                        json.put("Longuitud", Long);
-                        json.put("Localidad", Ciudadela);
-                        json.put("Observaciones", EDT10.getText());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    TareaWSInsertar tarea = new TareaWSInsertar();
-                    tarea.execute(json.toString());*/
-                }
-            });
             //Verifica si los permisos de Ubicacion esta concedidos. En caso negativo pide al usuario
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Codigo_Peticion_Permiso_Ubicacion);
@@ -202,6 +183,24 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
     public void onClick(View view) {
 
         switch (view.getId()) {
+            case R.id.BTN10:
+
+                Progress11.setVisibility(View.VISIBLE);
+                json = new JSONObject();
+
+                try {
+                    json.put("Cliente",sonadas.getString(getResources().getString(R.string.PropiedadIdCliente), ""));
+                    json.put("Servicio", Serviciax);
+                    json.put("Latitud", Lat);
+                    json.put("Longuitud", Long);
+                    json.put("Observaciones", EDT10.getText());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                TareaWSInsertar tarea = new TareaWSInsertar();
+                tarea.execute(json.toString());
+                break;
 
             case R.id.TXV40:
                 LLVV40.setAlpha(1f);
@@ -422,7 +421,7 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
 
             try {
                 // Construir los datos a enviar
-                URL url = new URL("http://sareta.somee.com/caminatodo");
+                URL url = new URL("http://sareta.somee.com/PeticionCliente");
                 String Datos_cuerpo =params[0];
                 MiConexion = (HttpURLConnection) url.openConnection();
                 MiConexion.setRequestMethod("POST");
@@ -453,10 +452,19 @@ public class Servicia extends AppCompatActivity implements View.OnClickListener 
         }
 
         protected void onPostExecute(String  result) {
+            Progress11.setVisibility(View.INVISIBLE);
             if (result.equals("1")){
                 Toast.makeText(Servicia.this, "Peticion de Servicio ha sido activada", Toast.LENGTH_LONG).show();
+                Handler tama = new Handler() ;
+                tama.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                },2500);
             }else{
                 Toast.makeText(Servicia.this, "Se ha reportado un problema. Verifique su conexion a internet e intentelo de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
             }
     }
     }

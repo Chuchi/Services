@@ -16,6 +16,14 @@ public class PanelCL extends AppCompatActivity {
 
     SharedPreferences tonadas;
     Handler Probala = new Handler();
+    Handler Cambiador = new Handler();
+    Runnable CambiaTitulo = new Runnable() {
+        public void run() {
+
+            setTitle( tonadas.getString(getResources().getString(R.string.PropiedadIdCliente), ""));
+
+        }
+    };
     Runnable Masahorita = new Runnable() {
         public void run() {
 
@@ -27,7 +35,7 @@ public class PanelCL extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tonadas = PreferenceManager.getDefaultSharedPreferences(this);
-        if (tonadas.getString(getResources().getString(R.string.PropiedadNombre), "").equals("")) {
+        if (tonadas.getString(getResources().getString(R.string.PropiedadIdCliente), "").equals("")) {
 
             //Verificamos que la aplicacion ha sido inicializada con el registro de cliente
             Intent Paris = new Intent("android.intent.action.Iniciando");
@@ -36,6 +44,7 @@ public class PanelCL extends AppCompatActivity {
         } else {
 
             setContentView(R.layout.activity_panel_cl);
+            Cambiador.postDelayed(CambiaTitulo,2500);
             //Instanciamos la barra de herramientas
             Toolbar TB10 = (Toolbar) findViewById(R.id.TB10);
             setSupportActionBar(TB10);

@@ -10,10 +10,7 @@
 
 
 
-
-    <string name="PropiedadNombre">PropiedadNombre</string>
-    <string name="PropiedadApellido">PropiedadApellido</string>
-    <string name="PropiedadCelular">PropiedadCelular</string>
+    <string name="PropiedadIdCliente">PropiedadIdCliente</string>
     <string name="title_activity_panel_cl">PanelCL</string>
 
     <string name="modificar">modificar</string>

@@ -32,8 +32,12 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,8 +56,8 @@ public class Iniciamox extends AppCompatActivity implements View.OnClickListener
     String ClaveFCM ="";
     Typeface TFAmaranthBold, TFAmaranthRegular;
     ProgressBar Progress10;
+    JSONObject json;
     private Handler tomate = new Handler();
-    private Handler mostaza = new Handler();
     Runnable Carme = new Runnable() {
         @Override
         public void run() {
@@ -117,21 +121,20 @@ public class Iniciamox extends AppCompatActivity implements View.OnClickListener
             Progress10.setVisibility(View.VISIBLE);
             IMV10.setVisibility(View.INVISIBLE);
 
-            SharedPreferences.Editor editorial = amadas.edit();
 
-            editorial.putString(getResources().getString(R.string.PropiedadNombre), ETX1.getText().toString());
-            editorial.putString(getResources().getString(R.string.PropiedadApellido), ETX2.getText().toString());
-            editorial.putString(getResources().getString(R.string.PropiedadCelular),ETX3.getText().toString());
 
-            editorial.apply();
+            json = new JSONObject();
 
-            tomate.postDelayed(new Runnable() {
-                public void run() {
-                    Progress10.setVisibility(View.INVISIBLE);
-                    Toast.makeText(Iniciamox.this, "RECEPCION EN SERVIDOR .... OK",                                Toast.LENGTH_LONG).show();
-                    mostaza.postDelayed(Carme,2000);
-                }
-            }, 3000);
+            try {
+                json.put("Nombre", ETX1.getText().toString());
+                json.put("Apellido", ETX2.getText().toString());
+                json.put("Celular",Integer.parseInt(ETX3.getText().toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+           TareaRFHRegistrarCliente tarea = new TareaRFHRegistrarCliente();
+            tarea.execute(json.toString());
 
 
          }
@@ -336,7 +339,7 @@ public class Iniciamox extends AppCompatActivity implements View.OnClickListener
                 editorial.apply();
 */
                 TareaRegistrarEnServidorLaClaveFCMSocio calmita = new TareaRegistrarEnServidorLaClaveFCMSocio();
-               calmita.execute(amadas.getString(getResources().getString(R.string.PropiedadNombre), ""));
+               calmita.execute(amadas.getString(getResources().getString(R.string.PropiedadIdCliente), ""));
 
             } else {
                 Toast.makeText(Iniciamox.this, "Proceso FALLIDO", Toast.LENGTH_LONG).show();
@@ -345,6 +348,7 @@ public class Iniciamox extends AppCompatActivity implements View.OnClickListener
             }
         }
     }
+
 
     public class TareaRegistrarEnServidorLaClaveFCMSocio extends AsyncTask<String, Integer, String> {
         String msg = "";
@@ -376,4 +380,91 @@ public class Iniciamox extends AppCompatActivity implements View.OnClickListener
 
         }
     }
+    private class TareaRFHRegistrarCliente extends AsyncTask<String, String, String> {
+
+        protected String doInBackground(String... params) {
+
+            String resul="";
+
+// Obtener la conexión
+
+
+            HttpURLConnection MiConexion = null;
+
+            try {
+                // Construir los datos a enviar
+                URL url = new URL("http://sareta.somee.com/GestionCliente");
+                String Datos_cuerpo =params[0];
+                MiConexion = (HttpURLConnection) url.openConnection();
+                MiConexion.setRequestMethod("POST");
+                MiConexion.setRequestProperty("Content-Type", "application/json");
+                MiConexion.setRequestProperty("Content-Length",  Integer.toString(Datos_cuerpo.getBytes().length));
+                //  connection.setRequestProperty("Content-Language", "en-US");
+
+                //  connection.setUseCaches (false);
+                MiConexion.setDoInput(true);
+                MiConexion.setDoOutput(true);
+
+                OutputStream out = new BufferedOutputStream(MiConexion.getOutputStream());
+
+                out.write(Datos_cuerpo.getBytes());
+                out.flush();
+                out.close();
+
+                resul=LectorRespuestas(MiConexion);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (MiConexion != null)
+                    MiConexion.disconnect();
+            }
+
+            return resul;
+        }
+
+        protected void onPostExecute(String  result) {
+            if (!result.equals("")){
+                SharedPreferences.Editor editorial = amadas.edit();
+                editorial.putString(getResources().getString(R.string.PropiedadIdCliente), Utilidades.SacaComillas(result));
+                editorial.apply();
+                Progress10.setVisibility(View.INVISIBLE);
+                Toast.makeText(Iniciamox.this, "REGISTRO CLIENTE SATISFACTORIO", Toast.LENGTH_LONG).show();
+                tomate.postDelayed(Carme,2500);
+            }else{
+                Progress10.setVisibility(View.INVISIBLE);
+                Toast.makeText(Iniciamox.this, "Se ha reportado un problema. Verifique sus datos y su conexion a internet e intentelo de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+            }
+        }
+    }
+    private String LectorRespuestas(HttpURLConnection connection) {
+        String result = null;
+        StringBuffer sb = new StringBuffer();
+        InputStream is = null;
+
+        try {
+            is = new BufferedInputStream(connection.getInputStream());
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String inputLine = "";
+            while ((inputLine = br.readLine()) != null) {
+                sb.append(inputLine);
+            }
+            result = sb.toString();
+        } catch (Exception e) {
+            // Log.i(TAG, "Error reading InputStream");
+            result = null;
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Log.i(TAG, "Error closing InputStream");
+                }
+            }
+        }
+
+        return result;
+    }
+
 }
